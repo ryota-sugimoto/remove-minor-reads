@@ -8,16 +8,17 @@ do
 done
 shift $((OPTIND - 1))
 
-[ $# == 2 ] || { echo "${0} <bam/sam> <ref_fasta>"; exit 1; }
+[ $# == 3 ] || { echo "${0} <bam/sam> <ref_fasta>"; exit 1; }
 [ -f ${1} ] || { echo "${1} not found."; exit 1; }
 [ -f ${2} ] || { echo "${2} not found."; exit 1; }
+[ -d ${3} ] || { echo "${3} not found."; exit 1; }
 
 BAM=$(cd $(dirname ${1}); pwd)/$(basename ${1})
 REF_FASTA=$(cd $(dirname ${2}); pwd)/$(basename ${2})
 
 PICARD_SORTSAM="/usr/local/share/java/SortSam.jar"
 
-WORKDIR=$(dirname ${BAM})
+WORKDIR=$(cd ${3}; pwd)
 BAM_FILENAME=$(echo $(basename ${BAM}) | sed 's/\.[sb]am$//')
 
 echo ${WORKDIR} ${BAM_FILENAME}
