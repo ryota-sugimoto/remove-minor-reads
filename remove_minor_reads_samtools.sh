@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-while getopts 't:' OPTION
+while getopts 't:vp:' OPTION
 do
   case $OPTION in
   t) THRESHOLD="-t ${OPTARG}" ;;
+  v) INVERT="-v" ;;
+  p) POSITIONS="-p ${OPTARG}" ;;
   esac
 done
 shift $((OPTIND - 1))
@@ -45,7 +47,9 @@ ${COMMAND[@]} > ${PILEUP} 2>/dev/null|| exit 1
 CLEANED_BAM=${WORKDIR}/${BAM_FILENAME}.cleaned.bam
 COMMAND_1=($(dirname ${0})/remove_minor_reads.py ${THRESHOLD}
                                                  ${SORTED_SAM}
-                                                 ${PILEUP})
+                                                 ${PILEUP}
+                                                 ${INVERT}
+                                                 ${POSITIONS})
 ${COMMAND_1[@]} \
   | samtools view -Shb /dev/stdin \
   | samtools sort -o /dev/stdin /dev/null > ${CLEANED_BAM} || exit 1

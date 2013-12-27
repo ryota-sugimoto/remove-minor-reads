@@ -126,7 +126,9 @@ def arrange_seq(sam_read):
 
 def filter_minor_reads_on_variations(sam,
                                      snp_indel,
-                                     threshold):
+                                     threshold,
+                                     spec_positions=[],
+                                     invert=False):
   d = {}
   for p in snp_indel.keys():
     num_major = snp_indel[p]["num_major_reads"]
@@ -141,12 +143,18 @@ def filter_minor_reads_on_variations(sam,
       seq = arrange_seq(read)
       end_pos = begin_pos + len(seq)
       included_snp_positions = [ p for p in snp_indel.keys() if p >= begin_pos and p < end_pos]
+      if spec_positions:
+        included_snp_positions = sorted(list(set(included_snp_positions) & set(spec_positions)))
+      if invert:
+        inv = lambda f: not f
+      else:
+        inv = lambda f:f
       f = True
       for p in included_snp_positions:
         sam_nuc = seq[p - begin_pos]
         if sam_nuc != snp_indel[p]["nucleotide"]:
           f = False
-      if f: 
+      if inv(f): 
         yield read
 
 import sys
@@ -179,7 +187,13 @@ if __name__ == "__main__":
   parser.add_argument("sam")
   parser.add_argument("pileup")
   parser.add_argument("-t", "--remove_threshold", default = 0.7, type=float)
+  parser.add_argument("-v", "--invert", action="store_true", default=False)
+  parser.add_argument("-p", "--position_file", type=argparse.FileType("r"))
   args = parser.parse_args()
+  
+  spec_pos = []
+  if args.position_file:
+    spec_pos = [ int(l.strip().split(":")[0]) for l in args.position_file if l ]
   
   for line in open(args.sam):
     if line[0] == "@":
@@ -192,6 +206,8 @@ if __name__ == "__main__":
   snp_indel = major_snps_indels(read_pileup(open(args.pileup))) 
   for read in filter_minor_reads_on_variations(sam,
                                                snp_indel,
-                                               args.remove_threshold):
+                                               args.remove_threshold,
+                                               spec_pos,
+                                               args.invert):
     read["cigar"] = "".join(str(t[0]) + t[1] for t in read["cigar"])
     print sam_format.format(**read)
