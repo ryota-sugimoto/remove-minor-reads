@@ -145,17 +145,18 @@ def filter_minor_reads_on_variations(sam,
       included_snp_positions = [ p for p in snp_indel.keys() if p >= begin_pos and p < end_pos]
       if spec_positions:
         included_snp_positions = sorted(list(set(included_snp_positions) & set(spec_positions)))
-      if invert:
-        inv = lambda f: not f
-      else:
-        inv = lambda f:f
-      f = True
-      for p in included_snp_positions:
-        sam_nuc = seq[p - begin_pos]
-        if sam_nuc != snp_indel[p]["nucleotide"]:
-          f = False
-      if inv(f): 
-        yield read
+      if included_snp_positions:
+        if invert:
+          inv = lambda f: not f
+        else:
+          inv = lambda f:f
+        f = True
+        for p in included_snp_positions:
+          sam_nuc = seq[p - begin_pos]
+          if sam_nuc != snp_indel[p]["nucleotide"]:
+            f = False
+        if inv(f): 
+          yield read
 
 import sys
 if __name__ == "__main___":
