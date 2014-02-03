@@ -43,7 +43,7 @@ ${COMMAND[@]} > ${PILEUP} 2>/dev/null|| exit 1
 
 #remove minor reads
 CLEANED_BAM=${WORKDIR}/${BAM_FILENAME}.cleaned.bam
-COMMAND_1=($(dirname ${0})/filter_no_snp_reads.py ${THRESHOLD}
+COMMAND_1=($(dirname ${0})/filter_hetero_reads.py ${THRESHOLD}
                                                   ${SORTED_SAM}
                                                   ${PILEUP})
 ${COMMAND_1[@]} \

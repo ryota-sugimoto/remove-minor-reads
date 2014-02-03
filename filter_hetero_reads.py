@@ -87,7 +87,6 @@ def hetero_positions(pileup, threshold=0.3):
       nuc_num_1 = count[0][1]
       nuc_num_2 = count[1][1]
       if nuc_num_1/float(num_reads) > threshold and nuc_num_2/float(num_reads) > threshold:
-        print position, count
         res.append(position)
   return res
 
