@@ -39,9 +39,10 @@ def count_pileup_base(data):
   ref_match_pattern = re.compile(r"[.,]")
   ref = data["reference_nucleotide"]
   res = {}
-  for b in data["bases"]:
-    b = ref_match_pattern.sub(ref, read_begin_end_pattern.sub("",b.upper()))
-    res[b] = res.get(b,0) + 1
+  if data.has_key("bases"):
+    for b in data["bases"]:
+      b = ref_match_pattern.sub(ref, read_begin_end_pattern.sub("",b.upper()))
+      res[b] = res.get(b,0) + 1
   return res
 
 def major_snps_indels(pileup_file):
@@ -53,10 +54,14 @@ def major_snps_indels(pileup_file):
     position = line["position"]
     num_reads = line["num_reads"]
     count = count_pileup_base(line)
-    major = sorted(count.items(),
-                   key = lambda l: l[1],reverse=True)[0]
-    major_nuc = major[0]
-    num_major = major[1]
+    if count:
+      major = sorted(count.items(),
+                     key = lambda l: l[1],reverse=True)[0]
+      major_nuc = major[0]
+      num_major = major[1]
+    else:
+      major_nuc = ""
+      num_major = 0
     if len(major_nuc) == 1 and major_nuc != ref:#snp
       d[position] = {"nucleotide": major_nuc,
                      "num_all_reads": num_reads,
