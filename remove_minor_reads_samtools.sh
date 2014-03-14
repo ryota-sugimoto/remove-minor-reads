@@ -25,6 +25,7 @@ BAM_FILENAME=$(echo $(basename ${BAM}) | sed 's/\.[sb]am$//')
 #sort sam
 SORTED_SAM=${WORKDIR}/${BAM_FILENAME}.sorted.sam
 SORTED_BAM=${WORKDIR}/${BAM_FILENAME}.sorted.bam
+TMP_BAM=${WORKDIR}/${BAM_FILENAME}.tmp.bam
 if [[ ${BAM} == *.sam ]]
 then
   COMMAND_1=(samtools view -Shb ${BAM})
@@ -33,7 +34,7 @@ then
   COMMAND_1=(samtools view -hb ${BAM})
 fi
 ${COMMAND_1[@]} \
-  | samtools sort -o ${BAM} /dev/null \
+  | samtools sort -o ${BAM} ${TMP_BAM} \
   | tee ${SORTED_BAM} \
   | samtools view -h /dev/stdin > ${SORTED_SAM} || exit 1
 
