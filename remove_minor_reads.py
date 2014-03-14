@@ -55,8 +55,7 @@ def major_snps_indels(pileup_file):
     num_reads = line["num_reads"]
     count = count_pileup_base(line)
     if count:
-      major = sorted(count.items(),
-                     key = lambda l: l[1],reverse=True)[0]
+      major = max(count.items(), key = lambda l: l[1])
       major_nuc = major[0]
       num_major = major[1]
     else:
@@ -162,6 +161,8 @@ def filter_minor_reads_on_variations(sam,
             f = False
         if inv(f): 
           yield read
+      else:
+        yield read
 
 import sys
 if __name__ == "__main___":
