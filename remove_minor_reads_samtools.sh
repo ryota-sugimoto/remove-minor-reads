@@ -53,7 +53,7 @@ COMMAND_1=($(dirname ${0})/remove_minor_reads.py ${THRESHOLD}
                                                  ${POSITIONS})
 ${COMMAND_1[@]} \
   | samtools view -Shb /dev/stdin \
-  | samtools sort -o /dev/stdin /dev/null > ${CLEANED_BAM} || exit 1
+  | samtools sort -o /dev/stdin ${TMP_BAM} > ${CLEANED_BAM} || exit 1
 
 samtools index ${CLEANED_BAM}
 rm ${PILEUP}
